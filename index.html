@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fce9f0">
+  <meta name="description" content="A little animated flower garden and a heartfelt Women's Day letter, made with love.">
+  <title>A Garden for You 🌷</title>
+  <style>
+    :root {
+      --ink: #59384b;
+      --rose: #e8759a;
+      --cream: #fffaf5;
+      --glass: rgba(255, 250, 247, .78);
+    }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; }
+    body {
+      margin: 0; min-height: 100vh; overflow-x: hidden; color: var(--ink);
+      font-family: ui-rounded, "Avenir Next", Avenir, "Segoe UI", sans-serif;
+      background: #a9dff0;
+    }
+    button { font: inherit; }
+    .scene {
+      position: relative; isolation: isolate; min-height: 100svh; overflow: hidden;
+      display: grid; place-items: center; padding: 36px 18px 170px;
+      background: linear-gradient(180deg, #8ed3f1 0%, #d5f0f6 54%, #fce4e6 100%);
+    }
+    .sky-glow {
+      position: absolute; z-index: -3; inset: 0;
+      background:
+        radial-gradient(ellipse at 15% 15%, rgba(255,255,255,.65), transparent 23%),
+        radial-gradient(ellipse at 82% 20%, rgba(255,235,246,.7), transparent 26%);
+      animation: skyBreath 8s ease-in-out infinite alternate;
+    }
+    .sun {
+      position: absolute; z-index: -2; top: 8%; right: 12%; width: clamp(75px, 12vw, 145px);
+      aspect-ratio: 1; border-radius: 50%;
+      background: radial-gradient(circle, #fff8d6 0%, #fff0bd 45%, rgba(255,239,190,0) 72%);
+      filter: blur(2px); opacity: .9;
+    }
+    .cloud {
+      position: absolute; z-index: -1; width: 170px; height: 46px; border-radius: 999px;
+      background: rgba(255,255,255,.66); filter: blur(1px);
+      animation: cloudDrift 24s linear infinite;
+    }
+    .cloud::before, .cloud::after { content:""; position:absolute; border-radius:50%; background:inherit; }
+    .cloud::before { width:72px;height:72px;left:28px;bottom:8px; }
+    .cloud::after { width:55px;height:55px;left:78px;bottom:4px; }
+    .cloud.one { top: 15%; left: -190px; }
+    .cloud.two { top: 29%; left: -230px; transform: scale(.68); animation-delay: -12s; opacity:.65; }
+    .headline {
+      position: relative; z-index: 3; text-align: center; width: min(720px, 100%);
+      margin: 0 auto 24px; animation: floatIn 1.2s both;
+    }
+    .eyebrow {
+      display: inline-block; margin-bottom: 12px; padding: 8px 15px;
+      border: 1px solid rgba(255,255,255,.72); border-radius: 999px;
+      background: rgba(255,255,255,.43); backdrop-filter: blur(8px);
+      font-size: .76rem; letter-spacing: .16em; text-transform: uppercase;
+    }
+    h1 {
+      margin: 0; font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.7rem, 8vw, 5.5rem); line-height: .98; font-weight: 500;
+      letter-spacing: -.045em; color: #7e3d5a; text-shadow: 0 3px 18px rgba(255,255,255,.6);
+    }
+    .subtitle { margin: 18px auto 0; max-width: 490px; font-size: clamp(1rem, 2.5vw, 1.15rem); line-height: 1.65; }
+    .garden {
+      position: absolute; z-index: 0; bottom: -5px; left: 0; width: 100%; height: min(48vh, 390px);
+      pointer-events: none;
+    }
+    .hill { position:absolute; bottom:-8%; width:120%; height:68%; left:-10%; border-radius:50% 50% 0 0; background:linear-gradient(180deg,#a5dca5,#76c18f); }
+    .hill.back { bottom: 12%; left:-20%; width:90%; height:44%; background:linear-gradient(180deg,#c7e9bb,#9bd49f); opacity:.92; }
+    .flower-bed { position:absolute; inset:0; }
+    .stem {
+      position:absolute; bottom: 0; left: var(--x); width: 3px; height: var(--h);
+      border-radius: 8px; background: linear-gradient(90deg,#4b9a65,#287d55);
+      transform-origin: bottom center; animation: sway var(--sway, 4s) ease-in-out infinite alternate;
+      animation-delay: var(--delay, 0s);
+    }
+    .stem::before, .stem::after {
+      content:""; position:absolute; width:24px; height:11px; background:#3e9b61;
+      border-radius:100% 0 100% 0; top: 55%; left:-20px; transform:rotate(-24deg);
+    }
+    .stem::after { top:72%; left:1px; transform:rotate(35deg) scaleX(-1); }
+    .bloom {
+      position:absolute; left:50%; top:0; width:var(--size); height:var(--size);
+      transform:translate(-50%,-42%); filter: drop-shadow(0 4px 4px rgba(75,75,75,.13));
+    }
+    .petal {
+      position:absolute; left:50%; top:50%; width:35%; height:48%;
+      transform-origin:50% 90%; border-radius:55% 55% 48% 48%;
+      background:var(--petal); border:1px solid rgba(255,255,255,.38);
+      box-shadow: inset 2px 3px 5px rgba(255,255,255,.25);
+    }
+    .flower-center {
+      position:absolute; width:35%; height:35%; left:50%; top:50%; transform:translate(-50%,-50%);
+      border-radius:50%; background:radial-gradient(circle at 35% 30%, #fff5d6, var(--center) 70%);
+      border:2px solid rgba(255,255,255,.35);
+    }
+    .bud {
+      position:absolute; left:50%; top:0; transform:translate(-50%,-35%) rotate(-12deg);
+      width:calc(var(--size) * .7); height:calc(var(--size) * .85);
+      border-radius:80% 20% 55% 45%; background:linear-gradient(135deg,#ffb8c7,var(--petal));
+      border:2px solid rgba(255,255,255,.4);
+    }
+    .open-letter {
+      position: relative; z-index: 5; display: inline-flex; align-items: center; gap: 10px;
+      border: 0; border-radius: 999px; padding: 15px 24px; cursor: pointer;
+      color: white; background: linear-gradient(135deg,#e76e98,#c95d8d);
+      box-shadow: 0 12px 28px rgba(174,76,116,.27); transition: transform .2s, box-shadow .2s;
+      animation: floatIn 1.1s .2s both;
+    }
+    .open-letter:hover { transform: translateY(-3px); box-shadow:0 16px 34px rgba(174,76,116,.32); }
+    .open-letter:focus-visible, .close:focus-visible { outline:3px solid #743d5b; outline-offset:4px; }
+    .hint { position:relative; z-index:2; margin-top:12px; font-size:.85rem; opacity:.82; }
+    .letter-layer {
+      position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; padding: 18px;
+      background: rgba(47,42,58,.32); backdrop-filter: blur(7px);
+      opacity:0; visibility:hidden; transition:opacity .35s, visibility .35s;
+    }
+    .letter-layer.show { opacity:1; visibility:visible; }
+    .letter {
+      position:relative; width:min(560px,100%); max-height:min(82vh,800px); overflow:auto;
+      padding:clamp(25px,6vw,48px); border-radius: 8px 8px 22px 8px;
+      background:
+        radial-gradient(ellipse at 0 0, rgba(255,226,232,.72), transparent 35%),
+        linear-gradient(135deg,#fffdf8,#fff4ec);
+      box-shadow:0 24px 90px rgba(54,28,49,.3); border:1px solid rgba(255,255,255,.8);
+      transform:translateY(22px) scale(.96); transition:transform .45s cubic-bezier(.2,.8,.2,1);
+    }
+    .show .letter { transform:translateY(0) scale(1); }
+    .letter::after { content:""; position:absolute; right:0; bottom:0; width:70px; height:70px; background:linear-gradient(135deg,transparent 50%,#f6d6df 50%); border-radius:0 0 20px 0; opacity:.65; pointer-events:none; }
+    .close {
+      position:absolute; top:12px; right:12px; width:42px; height:42px; border:0; border-radius:50%;
+      background:#f8e3e9; color:#7e3d5a; cursor:pointer; font-size:1.25rem;
+    }
+    .letter-kicker { color:#bd5e82; text-transform:uppercase; letter-spacing:.17em; font-size:.72rem; font-weight:700; }
+    .letter h2 { margin:13px 0 18px; font:500 clamp(2rem,7vw,3rem)/1.05 Georgia,serif; color:#813f5c; }
+    .letter p { font-size:1.02rem; line-height:1.8; margin:0 0 15px; }
+    .quote { padding:15px 18px; margin:22px 0; border-left:3px solid #e88da9; background:rgba(255,225,233,.48); font-family:Georgia,serif; font-size:1.16rem; line-height:1.55; }
+    .signature { margin-top:22px!important; color:#b14f78; font-family:Georgia,serif; font-style:italic; font-size:1.25rem!important; }
+    .sparkle {
+      position:absolute; z-index:2; color:#fff8ce; font-size:var(--size,20px); opacity:0;
+      animation: sparkleUp var(--duration,5s) linear infinite; animation-delay:var(--delay,0s);
+      text-shadow:0 0 12px rgba(255,255,255,.9); pointer-events:none;
+    }
+    .petal-fall {
+      position:absolute; z-index:2; top:-30px; left:var(--x); color:var(--color); font-size:var(--size);
+      opacity:.8; pointer-events:none; animation:fall var(--duration) linear infinite; animation-delay:var(--delay);
+    }
+    .footer-note { position:absolute; z-index:3; bottom:14px; left:12px; right:12px; text-align:center; font-size:.75rem; color:#4f765c; opacity:.8; }
+    @keyframes sway { from { transform:rotate(-4deg) } to { transform:rotate(5deg) } }
+    @keyframes cloudDrift { from { translate:0 0 } to { translate:calc(100vw + 450px) 0 } }
+    @keyframes fall { 0% { transform:translate3d(0,-30px,0) rotate(0deg); } 100% { transform:translate3d(80px,110vh,0) rotate(540deg); } }
+    @keyframes sparkleUp { 0% { transform:translateY(25px) scale(.4) rotate(0); opacity:0; } 20% {opacity:.8} 80% {opacity:.7} 100% {transform:translateY(-100px) scale(1.1) rotate(45deg);opacity:0} }
+    @keyframes floatIn { from {opacity:0;transform:translateY(14px)} to {opacity:1;transform:translateY(0)} }
+    @keyframes skyBreath { from {opacity:.55} to {opacity:1} }
+    @media (max-width:600px) {
+      .scene { padding-top:28px; padding-bottom:145px; }
+      .garden { height:34vh; min-height:230px; }
+      .subtitle { max-width:330px; }
+      .eyebrow { font-size:.66rem; }
+      .footer-note { font-size:.68rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; scroll-behavior:auto!important; transition-duration:.01ms!important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="scene" id="scene">
+    <div class="sky-glow" aria-hidden="true"></div><div class="sun" aria-hidden="true"></div>
+    <div class="cloud one" aria-hidden="true"></div><div class="cloud two" aria-hidden="true"></div>
+    <div class="headline">
+      <div class="eyebrow">For the woman who makes my world bloom</div>
+      <h1>Happy Women’s Day,<br>my love 🌷</h1>
+      <p class="subtitle">A little garden, a thousand colours, and one tiny letter for the girl who makes ordinary days feel beautiful.</p>
+    </div>
+    <button class="open-letter" id="openLetter" type="button" aria-haspopup="dialog" aria-controls="letterLayer">
+      <span>💌</span> Open your little letter <span aria-hidden="true">↗</span>
+    </button>
+    <div class="hint">Made with love, just for you</div>
+    <div class="garden" aria-hidden="true">
+      <div class="hill back"></div><div class="hill"></div><div class="flower-bed" id="flowerBed"></div>
+    </div>
+    <div id="petals" aria-hidden="true"></div>
+    <div id="sparkles" aria-hidden="true"></div>
+    <div class="footer-note">A little reminder: the world is more beautiful with you in it ♡</div>
+  </main>
+
+  <div class="letter-layer" id="letterLayer" role="presentation">
+    <article class="letter" role="dialog" aria-modal="true" aria-labelledby="letterTitle" aria-describedby="letterBody">
+      <button class="close" id="closeLetter" type="button" aria-label="Close letter">×</button>
+      <div class="letter-kicker">A note from my heart</div>
+      <h2 id="letterTitle">To my favourite girl,</h2>
+      <div id="letterBody">
+        <p>Happy Women’s Day, my love. 🌸</p>
+        <p>I hope you always remember how special you are—not only today, but on every ordinary day in between. Your kindness, your smile, your strength, and the little things that make you <em>you</em> mean more to me than I can ever properly explain.</p>
+        <p>I hope life gives you a thousand reasons to smile, the courage to chase every dream you have, and the gentleness you deserve when the world feels heavy. Never forget how capable, beautiful, and loved you are.</p>
+        <div class="quote">“May you always grow toward the light, bloom in your own time, and never doubt how lovely it is that you exist.”</div>
+        <p>And if you ever have a day when you forget your own magic, let me remind you. I’ll be cheering for you, holding your hand, and loving you through every season.</p>
+        <p class="signature">With all my love, always ♡</p>
+      </div>
+    </article>
+  </div>
+  <script>
+    (() => {
+      const bed = document.getElementById('flowerBed');
+      const petals = document.getElementById('petals');
+      const sparkles = document.getElementById('sparkles');
+      const colors = [
+        ['#f58eaa','#c94f79'], ['#ffc0c7','#d86d8c'], ['#ffd0ad','#d98b69'],
+        ['#d8e9b5','#98b86c'], ['#b7e1f4','#6aaecf'], ['#f6d8e8','#c68baa'],
+        ['#fff0b7','#d7b45f'], ['#f4a8bf','#c85f87']
+      ];
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function makeFlower(index, x, height, size, paletteIndex, budOnly) {
+        const stem = document.createElement('div');
+        stem.className = 'stem';
+        stem.style.setProperty('--x', x + '%');
+        stem.style.setProperty('--h', height + 'px');
+        stem.style.setProperty('--size', size + 'px');
+        stem.style.setProperty('--petal', colors[paletteIndex][0]);
+        stem.style.setProperty('--center', colors[paletteIndex][1]);
+        stem.style.setProperty('--sway', (3.2 + (index % 5) * .45) + 's');
+        stem.style.setProperty('--delay', (-index * .31) + 's');
+
+        if (budOnly) {
+          const bud = document.createElement('div');
+          bud.className = 'bud';
+          stem.appendChild(bud);
+        } else {
+          const bloom = document.createElement('div');
+          bloom.className = 'bloom';
+          for (let layer = 0; layer < 3; layer++) {
+            const count = 8 + layer * 3;
+            for (let p = 0; p < count; p++) {
+              const petal = document.createElement('span');
+              petal.className = 'petal';
+              petal.style.transform = `translate(-50%,-90%) rotate(${p * (360 / count)}deg) scale(${1 - layer * .17})`;
+              petal.style.zIndex = String(layer);
+              bloom.appendChild(petal);
+            }
+          }
+          const center = document.createElement('span');
+          center.className = 'flower-center';
+          center.style.zIndex = '5';
+          bloom.appendChild(center);
+          stem.appendChild(bloom);
+        }
+        bed.appendChild(stem);
+      }
+
+      // Layer flowers from the front edge toward the horizon.
+      let seed = 73;
+      const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+      for (let i = 0; i < 54; i++) {
+        const x = 1 + (i / 53) * 98 + (rand() * 2 - 1) * 2;
+        const height = 90 + rand() * 215;
+        const size = 24 + rand() * 48;
+        makeFlower(i, Math.max(0, Math.min(98, x)), height, size, Math.floor(rand() * colors.length), rand() < .19);
+      }
+
+      if (!reduced) {
+        const petalColors = ['#fff0f5','#ffb5cb','#ffe8ad','#f6c9e1'];
+        for (let i = 0; i < 22; i++) {
+          const p = document.createElement('span');
+          p.className = 'petal-fall';
+          p.textContent = '✿';
+          p.style.setProperty('--x', (rand() * 100) + '%');
+          p.style.setProperty('--color', petalColors[i % petalColors.length]);
+          p.style.setProperty('--size', (10 + rand() * 12) + 'px');
+          p.style.setProperty('--duration', (10 + rand() * 13) + 's');
+          p.style.setProperty('--delay', (-rand() * 20) + 's');
+          petals.appendChild(p);
+        }
+        for (let i = 0; i < 15; i++) {
+          const s = document.createElement('span');
+          s.className = 'sparkle';
+          s.textContent = ['✧','✦','✧'][i % 3];
+          s.style.left = (rand() * 95) + '%';
+          s.style.top = (20 + rand() * 60) + '%';
+          s.style.setProperty('--size', (12 + rand() * 16) + 'px');
+          s.style.setProperty('--duration', (4 + rand() * 5) + 's');
+          s.style.setProperty('--delay', (-rand() * 8) + 's');
+          sparkles.appendChild(s);
+        }
+      }
+
+      const layer = document.getElementById('letterLayer');
+      const openButton = document.getElementById('openLetter');
+      const closeButton = document.getElementById('closeLetter');
+      function openLetter() {
+        layer.classList.add('show');
+        closeButton.focus();
+      }
+      function closeLetter() {
+        layer.classList.remove('show');
+        openButton.focus();
+      }
+      openButton.addEventListener('click', openLetter);
+      closeButton.addEventListener('click', closeLetter);
+      layer.addEventListener('click', e => { if (e.target === layer) closeLetter(); });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && layer.classList.contains('show')) closeLetter();
+      });
+    })();
+  </script>
+</body>
+</html>
